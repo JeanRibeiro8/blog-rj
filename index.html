@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RJ — Rebeca & Jean</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="hearts" id="heartsBg"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">um cantinho só nosso</div>
+  <div class="rj-mark display">RJ</div>
+  <h2>Rebeca &amp; Jean</h2>
+  <div class="sub">uma história contada em fotos, cartas e pequenas aventuras</div>
+
+  <div class="counter" id="counter">
+    <div class="unit"><div class="num" id="cAnos">0</div><div class="label">anos</div></div>
+    <div class="unit"><div class="num" id="cMeses">0</div><div class="label">meses</div></div>
+    <div class="unit"><div class="num" id="cDias">0</div><div class="label">dias</div></div>
+  </div>
+  <div class="scroll-hint">↓</div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="sec-head">
+    <div class="num serif">capítulo um</div>
+    <h2>Nosso álbum</h2>
+    <p>os momentos que a gente guardou</p>
+  </div>
+  <div class="timeline" id="timelineList"></div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="sec-head">
+    <div class="num serif">capítulo dois</div>
+    <h2>O conto de RJ</h2>
+    <p>nossa história, contada como uma lenda</p>
+  </div>
+  <div id="storyList"></div>
+</section>
+
+<!-- GAME -->
+<section id="game">
+  <div class="sec-head">
+    <div class="num serif">capítulo três</div>
+    <h2>A caça às memórias</h2>
+    <p>corra, pule e colete os corações escondidos</p>
+  </div>
+  <div class="game-wrap">
+    <div class="game-hud">
+      <span>Fase <span id="hudLevel">1</span>/3 · 💗 <span id="hudCoins">0</span> / <span id="hudTotal">0</span></span>
+      <span id="hudLives">❤❤❤</span>
+    </div>
+    <div style="position:relative;">
+      <canvas id="gameCanvas" width="800" height="360"></canvas>
+      <div id="levelOverlay" class="level-overlay hidden">
+        <div class="level-overlay-box">
+          <div id="levelOverlayTitle">Fase 1</div>
+          <p id="levelOverlayText">Colete os corações, desvie dos inimigos.</p>
+          <button class="btn" id="levelOverlayBtn">Começar</button>
+        </div>
+      </div>
+    </div>
+    <div class="game-controls">
+      <button class="ctrl-btn" id="btnLeft">◀</button>
+      <button class="ctrl-btn" id="btnJump">▲</button>
+      <button class="ctrl-btn" id="btnRight">▶</button>
+    </div>
+    <div class="game-note">setas do teclado ou os botões acima · desvie dos inimigos e cuidado com os buracos</div>
+  </div>
+</section>
+
+<!-- REASONS -->
+<section id="reasons">
+  <div class="sec-head">
+    <div class="num serif">capítulo quatro</div>
+    <h2>Motivos</h2>
+    <p>um novo motivo a cada clique</p>
+  </div>
+  <div class="reason-box">
+    <div class="reason-text" id="reasonText">clique no botão e descubra um motivo</div>
+    <button class="btn" id="reasonBtn">outro motivo ♥</button>
+  </div>
+</section>
+
+<!-- LETTERS -->
+<section id="letters">
+  <div class="sec-head">
+    <div class="num serif">capítulo cinco</div>
+    <h2>Cartas</h2>
+    <p>abra a que combinar com o seu momento</p>
+  </div>
+  <div class="letters-grid" id="lettersGrid"></div>
+</section>
+
+<!-- CALENDAR -->
+<section id="dates">
+  <div class="sec-head">
+    <div class="num serif">capítulo seis</div>
+    <h2>Datas nossas</h2>
+    <p>o que a gente comemora</p>
+  </div>
+  <div class="dates-list" id="datesList"></div>
+</section>
+
+<footer>
+  <div class="rj-mark display">RJ</div>
+  <div class="sub">Rebeca &amp; Jean</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-photo" id="modalPhoto">📷</div>
+    <p id="modalText"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
