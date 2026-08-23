@@ -27,10 +27,10 @@ const START_DATE = new Date(2026, 1, 14); // mês 1 = fevereiro (0-indexado)
 
 // Fotos do álbum. Troque `src: null` por uma URL ou base64 da foto real.
 const TIMELINE = [
-  { date: "26 de Outubro 2025", caption: "O dia em que tudo começou.", src: "/images/1.jpg" },
-  { date: "Janeiro 2026", caption: "Primeira vez que voce veio em casa 🥰", src: "/images/2.jpg" },
-  { date: "Caminhada no Parque", caption: "😎🏞", src: "/images/3.jpg" },
-  { date: "Hoje", caption: "E a história continua.", src: "/images/4.jpg" },
+  { date: "26 de Outubro 2025", caption: "O dia em que tudo começou.", src: "./images/1.jpg" },
+  { date: "Janeiro 2026", caption: "Primeira vez que voce veio em casa 🥰", src: "./images/2.jpg" },
+  { date: "Caminhada no Parque", caption: "😎🏞", src: "./images/3.jpg" },
+  { date: "Hoje", caption: "E a história continua.", src: "./images/4.jpg" },
 ];
 
 // Capítulos do conto ilustrado — "A Guardiã do Vale de Cinza"
