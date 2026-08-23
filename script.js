@@ -3,43 +3,64 @@
    CONFIGURAÇÃO — edite aqui para personalizar o site
    ============================================================ */
 
+   // Music
+   (function musicPlayer(){
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicBtn');
+  let playing = false;
+  btn.addEventListener('click', ()=>{
+    if(playing){
+      audio.pause();
+      btn.textContent = '🎵';
+      btn.classList.remove('playing');
+    } else {
+      audio.play().catch(()=>{});
+      btn.textContent = '⏸';
+      btn.classList.add('playing');
+    }
+    playing = !playing;
+  });
+})();
+
 // Data de início do relacionamento (ajuste o ANO correto)
 const START_DATE = new Date(2026, 1, 14); // mês 1 = fevereiro (0-indexado)
 
 // Fotos do álbum. Troque `src: null` por uma URL ou base64 da foto real.
 const TIMELINE = [
-  { date: "14 de fevereiro", caption: "O dia em que tudo começou.", src: null },
-  { date: "Nosso primeiro passeio", caption: "Ainda me lembro do que você vestia.", src: null },
-  { date: "Uma tarde qualquer", caption: "Daquelas que viram memória boa sem avisar.", src: null },
-  { date: "Hoje", caption: "E a história continua.", src: null },
+  { date: "26 de Outubro 2025", caption: "O dia em que tudo começou.", src: "/images/1.jpg" },
+  { date: "Janeiro 2026", caption: "Primeira vez que voce veio em casa 🥰", src: "/images/2.jpg" },
+  { date: "Caminhada no Parque", caption: "😎🏞", src: "/images/3.jpg" },
+  { date: "Hoje", caption: "E a história continua.", src: "/images/4.jpg" },
 ];
 
-
 // Capítulos do conto ilustrado — "A Guardiã do Vale de Cinza"
-
 const STORY = [
-  { title: "O encontro nas brumas", text: "Ísera não perguntou o nome dele. Atacou primeiro. Sua fúria não vinha de treino, mas de tudo que ela jurara proteger sozinha — e Cassian, o guerreiro mais forte de sua Ordem, só se defendia, absorvendo cada golpe, sem nunca revidar para ferir.", img: "images/ch1-luta.jpg" },
+  { title: "A fuga", text: "Rebeca nasceu para ser rainha de Álvora, mas cresceu ouvindo que seu lugar era ao lado de um trono, nunca sobre ele. Rebelde desde cedo, aprendeu escondida a manejar a espada com um velho guarda que jurou nunca contar ao rei. Prometida a um duque que nunca vira seu rosto, recusou-se a aceitar um destino escolhido por outros: na noite antes do casamento, vestiu as roupas de treino e partiu do castelo sem olhar para trás.", img: "images/ch0.png" },
+  { title: "O Vale de Cinza", text: "Levou meses até encontrar um lugar que os mapas do reino sequer ousavam desenhar direito, escondido por uma névoa que confundia quem se aproximava com más intenções. Ali, entre ruínas de um templo antigo, restavam os vestígios de uma ordem que séculos atrás jurara proteger aquelas terras. Não havia mais ninguém para cumprir aquele juramento — então a rebelde Rebeca o fez seu.", img: "images/ch-1.png" },
+  { title: "Tornando-se guardiã", text: "Ela aprendeu a ler os ventos do vale e as trilhas que os cervos deixavam entre as árvores. E aprendeu, com o tempo, a odiar tudo que vinha de fora — porque tudo que viera de fora até então só tentara decidir por ela. Pretendentes, soldados enviados para \"resgatá-la\": todos encontraram a mesma resposta rebelde, na ponta de uma lâmina.", img: "images/ch-2.png" },
+  { title: "Passos na névoa", text: "Foi assim, depois de estações inteiras sozinha, que Rebeca ouviu cascos de cavalo atravessando a bruma — e não pensou duas vezes antes de pegar a espada.", img: "images/ch-3.png" },
+  { title: "O encontro nas brumas", text: "Rebeca não perguntou o nome dele. Atacou primeiro. Sua fúria não vinha de treino, mas de tudo que ela jurara proteger sozinha — e Jean, o guerreiro mais forte de sua Ordem, só se defendia, absorvendo cada golpe, sem nunca revidar para ferir.", img: "images/ch1-luta.jpg" },
   { title: "O desarme", text: "\"Você luta como quem odeia guerra\", ela disse, ofegante, quando a espada dele prendeu a dela contra uma raiz. \"E você luta como quem só conhece guerra\", ele respondeu — soltando a lâmina no chão, sem se aproximar mais do que o necessário.", img: "images/ch2-desarme.jpg" },
-  { title: "A confiança que cresce", text: "Cassian não tentou mudá-la, nem convencê-la a voltar. Sentava-se longe, deixava que ela se aproximasse em seu próprio tempo. Aos poucos, Ísera começou a mostrar-lhe o vale — não como quem guia um visitante, mas como quem finalmente confia em alguém.", img: "images/ch3-vale.jpg" },
-  { title: "O retorno sem armadura", text: "Voltou meses depois, sem armadura e sem espada — só para ver se a névoa ainda estava lá. Estava. E Ísera, ao vê-lo atravessar a bruma desarmado, entendeu: ele não tinha voltado para vigiá-la. Tinha voltado porque escolhera ficar.", img: "images/ch4-retorno.jpg" },
+  { title: "A confiança que cresce", text: "Jean não tentou mudá-la, nem convencê-la a voltar. Sentava-se longe, deixava que ela se aproximasse em seu próprio tempo. Aos poucos, Rebeca começou a mostrar-lhe o vale — não como quem guia um visitante, mas como quem finalmente confia em alguém.", img: "images/ch3-vale.jpg" },
+  { title: "O retorno sem armadura", text: "Voltou meses depois, sem armadura e sem espada — só para ver se a névoa ainda estava lá. Estava. E Rebeca, ao vê-lo atravessar a bruma desarmado, entendeu: ele não tinha voltado para vigiá-la. Tinha voltado porque escolhera ficar.", img: "images/ch4-retorno.jpg" },
 ];
 
 // Motivos que aparecem no botão "outro motivo"
 const REASONS = [
-  "Porque seu jeito de rir muda o meu dia inteiro.",
-  "Porque você me escuta de verdade.",
+  "Porque seu sorriso consegue mudar meu humor e o meu dia inteiro.",
+  "Porque você gosta de mim sabendo exatamente quem eu sou — e fica mesmo assim.",
   "Porque com você, até o silêncio é bom.",
   "Porque você é o meu lugar favorito.",
-  "Porque você acredita em mim até quando eu esqueço de acreditar.",
+  "Porque seu jeitinho baixinha do meu lado é exatamente do tamanho que eu mais gosto de abraçar.",
   "Porque cada dia ao seu lado parece o primeiro.",
 ];
 
 // Cartas por humor/momento
 const LETTERS = [
-  { icon:"🌧️", label:"quando estiver triste", text:"Se você está lendo isso, é porque o dia não está fácil. Respira. Eu estou com você, mesmo de longe. Você é mais forte do que imagina." },
-  { icon:"💭", label:"quando sentir saudade", text:"A saudade só existe porque o que a gente vive é bom demais para caber só na memória. Já estou pensando em você." },
-  { icon:"🏆", label:"quando estiver orgulhosa de si", text:"Guarda esse orgulho, ele é bem merecido. Eu vejo o quanto você se esforça, e tenho um orgulho enorme de você." },
-  { icon:"😴", label:"antes de dormir", text:"Durma bem. Amanhã a gente continua essa história. Te amo." },
+  { icon:"🌧️", label:"quando estiver triste", text:"Se você está lendo isso, é porque o dia não está fácil. Respira. Eu estou com você, mesmo de longe. Você é mais forte do que imagina.", img:"images/tri.jpg" },
+  { icon:"💭", label:"quando sentir saudade", text:"A saudade só existe porque o que a gente vive é bom demais para caber só na memória. Já estou pensando em você.", img:"images/sdd.jpg" },
+  { icon:"🏆", label:"quando estiver orgulhosa de si", text:"Guarda esse orgulho, ele é bem merecido. Eu vejo o quanto você se esforça, e tenho um orgulho enorme de você.", img:"images/or.jpg" },
+  { icon:"😴", label:"antes de dormir", text:"Durma bem Amor. Amanhã a gente continua essa história. Te amo, fica com Deus 😘.", img:"images/dom.jpg" },
 ];
 
 // Datas especiais
@@ -135,7 +156,7 @@ LETTERS.forEach(l=>{
   const card = document.createElement('div');
   card.className='letter-card';
   card.innerHTML = `<div class="icon">${l.icon}</div><div class="label serif">${l.label}</div>`;
-  card.addEventListener('click', ()=> openModal(null, l.text));
+card.addEventListener('click', ()=> openModal(l.img, l.text));
   lettersGrid.appendChild(card);
 });
 
@@ -164,14 +185,18 @@ modalOverlay.addEventListener('click', (e)=>{ if(e.target===modalOverlay) modalO
    JOGO — 3 fases, plataforma estilo Mario, com inimigos e parkour
    ============================================================ */
 const GAME_PHOTOS = [
-  { caption: "Encontrado! Aquele dia no parque.", src: null },
-  { caption: "Encontrado! Nosso primeiro selfie horrível e perfeito.", src: null },
-  { caption: "Encontrado! A tarde que virou memória favorita.", src: null },
-  { caption: "Encontrado! Você sorrindo do jeito que eu mais gosto.", src: null },
-  { caption: "Encontrado! O dia que eu soube que era você.", src: null },
-  { caption: "Encontrado! Aquela viagem inesquecível.", src: null },
-  { caption: "Encontrado! O dia bobo que virou piada interna.", src: null },
-  { caption: "Encontrado! A primeira vez que te chamei de namorada.", src: null },
+  { caption:    "Encontrado! Rosas para uma rosa💗💗.", src: "images/c1.jpg" },
+  { caption: "Encontrado! Primeira vez em casa", src: "images/c2.mp4" },
+  { caption: "Encontrado! Penteando os Cachinhos 😍.", src: "images/c3.jpg" },
+  { caption: "Encontrado! Você sorrindo do jeito que eu mais gosto.", src: "images/c4.jpg" },
+  { caption: "Encontrado! Dirigindo o Carro 🙈", src: "images/c5.jpg" },
+  { caption: "Encontrado! Primeira cartinha.", src: "images/c6.jpg" },
+  { caption: "Encontrado! 😃", src: "images/c7.jpg" },
+  { caption: "Encontrado! Nos meus braços fortes 🙈.", src: "images/c8.jpg" },
+  { caption: "Encontrado! Andando na cidade", src: "images/c9.jpg" },
+  { caption: "Encontrado! Manha no Parque.", src: "images/c10.jpg" },
+  { caption: "Encontrado! A melhor foto kkkkkkk.", src: "images/c11.jpg" },
+  { caption: "Encontrado! Aquele dia no parque.", src: "images/c12.jpg"},
 ];
 
 const canvas = document.getElementById('gameCanvas');
@@ -217,12 +242,11 @@ const LEVELS = [
       {x:700, y:200, w:90, h:16},
     ],
     coins: [
-      {x:265, y:205, photoIdx:0},
-      {x:385, y:155, photoIdx:1},
-      {x:515, y:205, photoIdx:2},
-      {x:745, y:165, photoIdx:3},
-      {x:125, y:255, photoIdx:4},
-    ],
+  {x:265, y:205, photoIdx:4},
+  {x:385, y:155, photoIdx:5},
+  {x:515, y:205, photoIdx:6},
+  {x:745, y:165, photoIdx:7},
+],
     enemies: [
       {x:340, y:190-22, w:22, h:22, patrolMin:340, patrolMax:420, speed:1.8, dir:1},
       {x:590, y:290-22, w:22, h:22, patrolMin:590, patrolMax:670, speed:2, dir:-1},
@@ -242,13 +266,11 @@ const LEVELS = [
       {x:730, y:260, w:60, h:16},
     ],
     coins: [
-      {x:265, y:225, photoIdx:0},
-      {x:375, y:175, photoIdx:1},
-      {x:480, y:135, photoIdx:2},
-      {x:575, y:195, photoIdx:3},
-      {x:670, y:145, photoIdx:4},
-      {x:95, y:265, photoIdx:5},
-    ],
+  {x:265, y:225, photoIdx:8},
+  {x:375, y:175, photoIdx:9},
+  {x:480, y:135, photoIdx:10},
+  {x:670, y:145, photoIdx:11},
+],
     enemies: [
       {x:230, y:260-22, w:22, h:22, patrolMin:230, patrolMax:305, speed:2, dir:1},
       {x:440, y:170-22, w:22, h:22, patrolMin:440, patrolMax:515, speed:2.2, dir:-1},
@@ -300,7 +322,7 @@ function loseLife(){
   document.getElementById('hudLives').textContent = '❤'.repeat(Math.max(lives,0));
   if(lives<=0){
     lives = 3;
-    showOverlay("Você caiu!", "Sem problema — respire e tente de novo.", "Recomeçar fase");
+    showOverlay("Amor que vale a pena também dói às vezes!", "Nem todo dia vai ser fácil, mas todo dia vale a pena tentar de novo");
     resetPlayer();
   } else {
     resetPlayer();
@@ -384,7 +406,7 @@ function update(){
       c.got = true;
       collectedCount++;
       document.getElementById('hudCoins').textContent = collectedCount;
-      const photo = GAME_PHOTOS[c.photoIdx % GAME_PHOTOS.length] || {caption:"Encontrado!", src:null};
+     const photo = GAME_PHOTOS[c.photoIdx] || {caption:"Encontrado!", src:null};
       openModal(photo.src, photo.caption);
     }
   }
