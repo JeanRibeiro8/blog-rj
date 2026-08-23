@@ -91,8 +91,8 @@
   .level-overlay{ position:absolute; inset:0; background:rgba(58,31,43,0.82); border-radius:12px; display:flex; align-items:center; justify-content:center; z-index:5;}
   .level-overlay.hidden{ display:none; }
   .level-overlay-box{ text-align:center; color:var(--cream); padding:20px;}
-  .level-overlay-box #levelOverlayTitle{ font-family:'Cinzel Decorative', serif; font-size:1.3rem; color:var(--gold); margin-bottom:10px;}
-  .level-overlay-box p{ font-family:'Cormorant Garamond', serif; font-size:1.15rem; margin-bottom:16px;}
+  .level-overlay-box #levelOverlayTitle{ font-family:'Cinzel Decorative', serif; font-size:1.15rem; color:var(--gold); margin-bottom:10px;}
+  .level-overlay-box p{ font-family:'Cormorant Garamond', serif; font-size:1rem; margin-bottom:16px;}
 
   /* REASONS */
   .reason-box{ background:var(--wine); color:var(--cream); border-radius:24px; padding:50px 30px; text-align:center; box-shadow:var(--shadow);}
