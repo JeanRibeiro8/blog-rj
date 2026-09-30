@@ -56,6 +56,10 @@
     <h2>A caça às memórias</h2>
     <p>corra, pule e colete os corações escondidos</p>
   </div>
+  <div class="game-modes" id="gameModes">
+    <button class="mode-btn active" data-mode="parkour">🏃 Parkour</button>
+    <button class="mode-btn" data-mode="shooter">🔫 Resgate em Ação</button>
+  </div>
   <div class="game-wrap">
     <div class="game-hud">
       <span>Fase <span id="hudLevel">1</span>/3 · 💗 <span id="hudCoins">0</span> / <span id="hudTotal">0</span></span>
@@ -127,10 +131,26 @@
   </div>
 </div>
 
+<!-- STORY MODAL (leitura do conto) -->
+<div class="modal-overlay" id="storyModalOverlay">
+  <div class="modal-box story-modal-box">
+    <button class="modal-close" id="storyModalClose">✕</button>
+    <div class="story-modal-img" id="storyModalImg"></div>
+    <div class="ch-num" id="storyModalNum"></div>
+    <h3 id="storyModalTitle"></h3>
+    <p id="storyModalText"></p>
+    <div class="story-modal-nav">
+      <button id="storyPrevBtn">‹ Anterior</button>
+      <button id="storyNextBtn">Próximo ›</button>
+    </div>
+  </div>
+</div>
+
 <audio id="bgMusic" loop preload="none">
   <source src="melim.mp3" type="audio/mpeg">
 </audio>
 <button class="music-btn" id="musicBtn" title="Tocar música">🎵</button>
+<button class="music-btn music-next" id="musicNextBtn" title="Próxima música">⏭</button>
 
 <script src="script.js"></script>
 </body>

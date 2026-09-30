@@ -1,13 +1,22 @@
-
 /* ============================================================
    CONFIGURAÇÃO — edite aqui para personalizar o site
    ============================================================ */
 
    // Music
    (function musicPlayer(){
+  const TRACKS = ['melim.mp3', 'musica2.mp3'];
   const audio = document.getElementById('bgMusic');
   const btn = document.getElementById('musicBtn');
+  const nextBtn = document.getElementById('musicNextBtn');
+  let trackIdx = 0;
   let playing = false;
+
+  function loadTrack(idx, keepPlaying){
+    trackIdx = (idx + TRACKS.length) % TRACKS.length;
+    audio.src = TRACKS[trackIdx];
+    if(keepPlaying) audio.play().catch(()=>{});
+  }
+
   btn.addEventListener('click', ()=>{
     if(playing){
       audio.pause();
@@ -20,6 +29,16 @@
     }
     playing = !playing;
   });
+
+  if(nextBtn){
+    nextBtn.addEventListener('click', ()=>{
+      loadTrack(trackIdx+1, playing);
+    });
+  }
+
+  // troca pra próxima faixa automaticamente quando a atual termina
+  audio.removeAttribute('loop');
+  audio.addEventListener('ended', ()=> loadTrack(trackIdx+1, true));
 })();
 
 // Data de início do relacionamento (ajuste o ANO correto)
@@ -53,6 +72,21 @@ const REASONS = [
   "Porque você é o meu lugar favorito.",
   "Porque seu jeitinho baixinha do meu lado é exatamente do tamanho que eu mais gosto de abraçar.",
   "Porque cada dia ao seu lado parece o primeiro.",
+
+"Porque você ri das minhas piadas ruins e ainda assim continua do meu lado.",
+"Porque seu abraço resolve problemas que palavras não resolvem.",
+"Porque a gente pode não fazer nada e ainda assim ser o melhor dia.",
+"Porque você tem paciência comigo até quando eu não mereço.",
+"Porque com você tudo fica mais leve, até os dias pesados.",
+"Porque você comemora minhas pequenas vitórias como se fossem gigantes.",
+"Porque você é a pessoa que eu quero contar primeiro quando algo bom acontece.",
+"Porque seu cheiro virou sinônimo de lar pra mim.",
+"Porque cada 'oi bom dia' seu é motivo suficiente pra sorrir sozinho.",
+"Porque você é gentil até quando ninguém está olhando.",
+"Porque com você eu aprendi que amor também é escolha, todo dia de novo.",
+"Porque você guarda os detalhes que eu nem lembro ter contado.",
+"Porque eu escolheria você de novo, em qualquer versão da minha vida.",
+
 ];
 
 // Cartas por humor/momento
@@ -128,20 +162,50 @@ TIMELINE.forEach(item=>{
   tlList.appendChild(div);
 });
 
-// ---------- story chapters ----------
+// ---------- story chapters (álbum de miniaturas) ----------
 const storyList = document.getElementById('storyList');
+storyList.classList.add('story-grid');
 STORY.forEach((ch,i)=>{
-  const div = document.createElement('div');
-  div.className='chapter';
-  div.innerHTML = `
-    <div class="chapter-img">${ch.img ? `<img src="${ch.img}" alt="">` : `capítulo ${i+1}`}</div>
-    <div class="chapter-body">
-      <div class="ch-num">capítulo ${i+1}</div>
-      <h3>${ch.title}</h3>
-      <p>${ch.text}</p>
-    </div>`;
-  storyList.appendChild(div);
+  const tile = document.createElement('div');
+  tile.className='story-tile';
+  tile.innerHTML = `
+    ${ch.img ? `<img src="${ch.img}" alt="">` : `<div class="story-tile-fallback">capítulo ${i+1}</div>`}
+    <div class="story-tile-num">cap. ${i+1}</div>
+    <div class="story-tile-title">${ch.title}</div>`;
+  tile.addEventListener('click', ()=> openStoryModal(i));
+  storyList.appendChild(tile);
 });
+
+// ---------- story reader modal (leitura completa do conto) ----------
+const storyModalOverlay = document.getElementById('storyModalOverlay');
+const storyModalImg = document.getElementById('storyModalImg');
+const storyModalNum = document.getElementById('storyModalNum');
+const storyModalTitle = document.getElementById('storyModalTitle');
+const storyModalText = document.getElementById('storyModalText');
+const storyPrevBtn = document.getElementById('storyPrevBtn');
+const storyNextBtn = document.getElementById('storyNextBtn');
+let storyIdx = 0;
+
+function openStoryModal(i){
+  storyIdx = i;
+  renderStoryModal();
+  storyModalOverlay.classList.add('open');
+}
+function renderStoryModal(){
+  const ch = STORY[storyIdx];
+  storyModalImg.innerHTML = ch.img ? `<img src="${ch.img}" alt="">` : '';
+  storyModalNum.textContent = `capítulo ${storyIdx+1}`;
+  storyModalTitle.textContent = ch.title;
+  storyModalText.textContent = ch.text;
+  storyModalOverlay.querySelector('.story-modal-box').scrollTop = 0;
+  storyPrevBtn.disabled = storyIdx===0;
+  storyNextBtn.textContent = storyIdx===STORY.length-1 ? 'Fim ✓' : 'Próximo ›';
+  storyNextBtn.disabled = storyIdx===STORY.length-1;
+}
+storyPrevBtn.addEventListener('click', ()=>{ if(storyIdx>0){ storyIdx--; renderStoryModal(); } });
+storyNextBtn.addEventListener('click', ()=>{ if(storyIdx<STORY.length-1){ storyIdx++; renderStoryModal(); } });
+document.getElementById('storyModalClose').addEventListener('click', ()=> storyModalOverlay.classList.remove('open'));
+storyModalOverlay.addEventListener('click', (e)=>{ if(e.target===storyModalOverlay) storyModalOverlay.classList.remove('open'); });
 
 // ---------- reasons ----------
 const reasonText = document.getElementById('reasonText');
@@ -182,7 +246,7 @@ document.getElementById('modalClose').addEventListener('click', ()=> modalOverla
 modalOverlay.addEventListener('click', (e)=>{ if(e.target===modalOverlay) modalOverlay.classList.remove('open'); });
 
 /* ============================================================
-   JOGO — 3 fases, plataforma estilo Mario, com inimigos e parkour
+   JOGO — dois modos: PARKOUR (plataforma) e TIRO (estilo run-and-gun)
    ============================================================ */
 const GAME_PHOTOS = [
   { caption:    "Encontrado! Rosas para uma rosa💗💗.", src: "images/c1.jpg" },
@@ -204,10 +268,10 @@ const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
 const GRAVITY = 0.62;
 
-// ---------- definição das 3 fases ----------
-// pits: buracos mortais (sem chão) — cair reinicia a fase
+// ---------- FASES — modo PARKOUR ----------
+// groundGaps: buracos mortais (sem chão) — cair reinicia a fase
 // enemies: patrulham entre patrolMin/patrolMax; tocar tira uma vida
-const LEVELS = [
+const PARKOUR_LEVELS = [
   { // Fase 1 — introdução, chão quase contínuo, poucos inimigos
     name: "O Bosque de Entrada",
     intro: "Atravesse o bosque e colete os corações. Cuidado com os espinhos que patrulham o caminho.",
@@ -278,30 +342,106 @@ const LEVELS = [
   },
 ];
 
+// ---------- FASES — modo TIRO (estilo run-and-gun / Metal Slug) ----------
+// enemies andam no chão e atiram no jogador; jogador atira de volta
+// coins ficam flutuando sobre o chão, é só encostar pra coletar
+const GROUND_Y = H-40-30; // altura dos pés dos inimigos, em cima do chão
+const SHOOTER_LEVELS = [
+  {
+    name: "Resgate no Posto Avançado",
+    intro: "Ande e atire para abrir caminho. Colete os corações escondidos no percurso.",
+    enemies: [
+      {x:480, y:GROUND_Y, w:26, h:30, patrolMin:420, patrolMax:620, speed:1.2, dir:-1, fireRate:2200, lastShot:0, hp:1},
+      {x:720, y:GROUND_Y, w:26, h:30, patrolMin:660, patrolMax:770, speed:1.4, dir:-1, fireRate:1900, lastShot:700, hp:1},
+    ],
+    coins: [
+      {x:250, y:H-70, photoIdx:0},
+      {x:420, y:H-70, photoIdx:1},
+      {x:610, y:H-70, photoIdx:2},
+      {x:760, y:H-70, photoIdx:3},
+    ],
+  },
+  {
+    name: "Travessia sob Fogo",
+    intro: "Mais inimigos e tiros mais rápidos. Use o pulo para se esquivar das balas.",
+    enemies: [
+      {x:340, y:GROUND_Y, w:26, h:30, patrolMin:300, patrolMax:420, speed:1.5, dir:-1, fireRate:1800, lastShot:0, hp:1},
+      {x:540, y:GROUND_Y, w:26, h:30, patrolMin:500, patrolMax:620, speed:1.6, dir:1, fireRate:1600, lastShot:500, hp:1},
+      {x:730, y:GROUND_Y, w:26, h:30, patrolMin:680, patrolMax:780, speed:1.8, dir:-1, fireRate:1500, lastShot:1000, hp:1},
+    ],
+    coins: [
+      {x:230, y:H-70, photoIdx:4},
+      {x:430, y:H-70, photoIdx:5},
+      {x:610, y:H-70, photoIdx:6},
+      {x:760, y:H-70, photoIdx:7},
+    ],
+  },
+  {
+    name: "Última Linha de Defesa",
+    intro: "A missão final. Inimigos vêm dos dois lados — mantenha a calma e o dedo no gatilho.",
+    enemies: [
+      {x:230, y:GROUND_Y, w:26, h:30, patrolMin:180, patrolMax:320, speed:1.7, dir:1, fireRate:1500, lastShot:0, hp:1},
+      {x:440, y:GROUND_Y, w:26, h:30, patrolMin:400, patrolMax:540, speed:1.8, dir:-1, fireRate:1400, lastShot:500, hp:1},
+      {x:610, y:GROUND_Y, w:26, h:30, patrolMin:580, patrolMax:700, speed:2, dir:1, fireRate:1300, lastShot:900, hp:1},
+      {x:750, y:GROUND_Y, w:26, h:30, patrolMin:710, patrolMax:790, speed:2.1, dir:-1, fireRate:1200, lastShot:1300, hp:1},
+    ],
+    coins: [
+      {x:200, y:H-70, photoIdx:8},
+      {x:400, y:H-70, photoIdx:9},
+      {x:560, y:H-70, photoIdx:10},
+      {x:740, y:H-70, photoIdx:11},
+    ],
+  },
+];
+
+let currentMode = 'parkour'; // 'parkour' | 'shooter'
 let levelIdx = 0;
 let lives = 3;
 let collectedCount = 0;
 let totalThisLevel = 0;
 let player, platforms, coins, enemies, groundGaps, levelRunning = false;
+let playerBullets = [], enemyBullets = [];
 
-const STORAGE_KEY = 'rj-game-progress-v2';
+function currentLevels(){ return currentMode==='parkour' ? PARKOUR_LEVELS : SHOOTER_LEVELS; }
+function storageKey(){ return 'rj-game-progress-v3-' + currentMode; }
 async function saveProgress(){
-  storageSet(STORAGE_KEY, { levelIdx, cleared: levelIdx>=LEVELS.length });
+  storageSet(storageKey(), { levelIdx, cleared: levelIdx>=currentLevels().length });
 }
 
 function setupLevel(i){
-  const lvl = LEVELS[i];
-  player = { x:30, y:H-90, w:26, h:34, vx:0, vy:0, onGround:false, speed:3.6, jump:-11.5, facing:1 };
-  platforms = [ {x:0, y:H-40, w:W, h:40}, ...lvl.platforms ];
-  groundGaps = lvl.groundGaps;
+  const levels = currentLevels();
+  const lvl = levels[i];
+  player = { x:30, y:H-90, w:26, h:34, vx:0, vy:0, onGround:false, speed:3.6, jump:-11.5, facing:1, shootCd:0 };
+  playerBullets = [];
+  enemyBullets = [];
+
+  if(currentMode==='parkour'){
+    platforms = [ {x:0, y:H-40, w:W, h:40}, ...lvl.platforms ];
+    groundGaps = lvl.groundGaps;
+  } else {
+    platforms = [ {x:0, y:H-40, w:W, h:40} ];
+    groundGaps = [];
+  }
+
   coins = lvl.coins.map(c=>({...c, r:13, got:false}));
-  enemies = lvl.enemies.map(e=>({...e, startX:e.x}));
+  enemies = lvl.enemies.map(e=>({...e, startX:e.x, lastShot:e.lastShot||0, alive:true}));
   totalThisLevel = coins.length;
   collectedCount = 0;
+
   document.getElementById('hudLevel').textContent = i+1;
   document.getElementById('hudTotal').textContent = totalThisLevel;
   document.getElementById('hudCoins').textContent = 0;
   document.getElementById('hudLives').textContent = '❤'.repeat(lives);
+
+  const btnJump = document.getElementById('btnJump');
+  if(btnJump) btnJump.textContent = currentMode==='parkour' ? '▲' : '🔫';
+  const note = document.querySelector('.game-note');
+  if(note){
+    note.textContent = currentMode==='parkour'
+      ? 'setas do teclado ou os botões acima · desvie dos inimigos e cuidado com os buracos'
+      : 'setas para mover · espaço ou 🔫 para atirar · derrube os inimigos e colete os corações';
+  }
+
   levelRunning = true;
 }
 
@@ -309,7 +449,7 @@ function showOverlay(title, text, btnLabel){
   levelRunning = false;
   document.getElementById('levelOverlayTitle').textContent = title;
   document.getElementById('levelOverlayText').textContent = text;
-  document.getElementById('levelOverlayBtn').textContent = btnLabel;
+  document.getElementById('levelOverlayBtn').textContent = btnLabel || 'Começar';
   document.getElementById('levelOverlay').classList.remove('hidden');
 }
 document.getElementById('levelOverlayBtn').addEventListener('click', ()=>{
@@ -317,12 +457,31 @@ document.getElementById('levelOverlayBtn').addEventListener('click', ()=>{
   levelRunning = true;
 });
 
+// ---------- seletor de modo ----------
+function switchMode(mode){
+  if(mode===currentMode) return;
+  currentMode = mode;
+  levelIdx = 0;
+  lives = 3;
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mode===mode);
+  });
+  document.getElementById('levelOverlay').classList.add('hidden');
+  setupLevel(levelIdx);
+}
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> switchMode(btn.dataset.mode));
+});
+
 function loseLife(){
   lives--;
   document.getElementById('hudLives').textContent = '❤'.repeat(Math.max(lives,0));
   if(lives<=0){
     lives = 3;
-    showOverlay("Amor que vale a pena também dói às vezes!", "Nem todo dia vai ser fácil, mas todo dia vale a pena tentar de novo");
+    const msg = currentMode==='parkour'
+      ? ["Amor que vale a pena também dói às vezes!", "Nem todo dia vai ser fácil, mas todo dia vale a pena tentar de novo"]
+      : ["Recue, recarregue e volte com tudo!", "Toda batalha por você vale a pena travar de novo"];
+    showOverlay(msg[0], msg[1]);
     resetPlayer();
   } else {
     resetPlayer();
@@ -330,6 +489,8 @@ function loseLife(){
 }
 function resetPlayer(){
   player.x=30; player.y=H-90; player.vx=0; player.vy=0;
+  playerBullets = [];
+  enemyBullets = [];
 }
 
 function rectsOverlap(a,b){ return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y; }
@@ -341,7 +502,7 @@ const keys = { left:false, right:false, jump:false };
 window.addEventListener('keydown', e=>{
   if(e.key==='ArrowLeft') keys.left=true;
   if(e.key==='ArrowRight') keys.right=true;
-  if(e.key===' '||e.key==='ArrowUp') keys.jump=true;
+  if(e.key===' '||e.key==='ArrowUp'){ e.preventDefault(); keys.jump=true; }
 });
 window.addEventListener('keyup', e=>{
   if(e.key==='ArrowLeft') keys.left=false;
@@ -358,9 +519,17 @@ function bindHold(id, prop){
 }
 bindHold('btnLeft','left'); bindHold('btnRight','right'); bindHold('btnJump','jump');
 
-function update(){
-  if(!levelRunning) return;
+function shoot(){
+  if(player.shootCd>0) return;
+  player.shootCd = 16; // frames de cooldown
+  playerBullets.push({
+    x: player.facing>0 ? player.x+player.w : player.x,
+    y: player.y+player.h/2-2,
+    w:8, h:4, vx: 9*player.facing
+  });
+}
 
+function updateParkour(){
   if(keys.left){ player.vx=-player.speed; player.facing=-1; }
   else if(keys.right){ player.vx=player.speed; player.facing=1; }
   else player.vx=0;
@@ -374,12 +543,10 @@ function update(){
   if(player.x<0) player.x=0;
   if(player.x+player.w>W) player.x=W-player.w;
 
-  // ground / gaps: falling past H means death (fell in a gap)
   if(player.y>H+20){ loseLife(); return; }
 
   player.onGround=false;
   for(const p of platforms){
-    // skip main ground under gaps
     if(p.y===H-40 && inGap(player.x, player.w)) continue;
     const feet = {x:player.x, y:player.y+player.h, w:player.w, h:6};
     if(player.vy>=0 && rectsOverlap(feet,p) && player.y+player.h-player.vy <= p.y+2){
@@ -389,7 +556,6 @@ function update(){
     }
   }
 
-  // enemies patrol
   for(const en of enemies){
     en.x += en.speed*en.dir;
     if(en.x < en.patrolMin){ en.x=en.patrolMin; en.dir=1; }
@@ -397,7 +563,75 @@ function update(){
     if(rectsOverlap(player, en)){ loseLife(); return; }
   }
 
-  // coins
+  collectCoins();
+  checkLevelComplete();
+}
+
+function updateShooter(){
+  if(player.shootCd>0) player.shootCd--;
+
+  if(keys.left){ player.vx=-player.speed; player.facing=-1; }
+  else if(keys.right){ player.vx=player.speed; player.facing=1; }
+  else player.vx=0;
+
+  if(keys.jump){
+    if(player.onGround){ player.vy=player.jump; player.onGround=false; }
+    shoot();
+  }
+
+  player.vy += GRAVITY;
+  player.x += player.vx;
+  player.y += player.vy;
+
+  if(player.x<0) player.x=0;
+  if(player.x+player.w>W) player.x=W-player.w;
+  if(player.y+player.h>H-40){ player.y=H-40-player.h; player.vy=0; player.onGround=true; }
+
+  // balas do jogador
+  for(const b of playerBullets){ b.x += b.vx; }
+  playerBullets = playerBullets.filter(b=> b.x>-20 && b.x<W+20);
+
+  // inimigos: patrulham e atiram
+  const now = performance.now();
+  for(const en of enemies){
+    if(!en.alive) continue;
+    en.x += en.speed*en.dir;
+    if(en.x < en.patrolMin){ en.x=en.patrolMin; en.dir=1; }
+    if(en.x+en.w > en.patrolMax){ en.x=en.patrolMax-en.w; en.dir=-1; }
+
+    if(now - en.lastShot > en.fireRate){
+      en.lastShot = now;
+      const toPlayer = (player.x+player.w/2) < (en.x+en.w/2) ? -1 : 1;
+      enemyBullets.push({ x: en.x+en.w/2, y: en.y+en.h/2-2, w:8, h:4, vx: 5.5*toPlayer });
+    }
+
+    if(rectsOverlap(player, en)){ loseLife(); return; }
+
+    for(const b of playerBullets){
+      if(rectsOverlap(b, en)){
+        en.alive = false;
+        b.x = -999;
+      }
+    }
+  }
+  enemies = enemies.filter(e=>e.alive);
+
+  // balas inimigas
+  for(const b of enemyBullets){ b.x += b.vx; }
+  for(const b of enemyBullets){
+    if(rectsOverlap(b, player)){
+      b.x = -999;
+      loseLife();
+      return;
+    }
+  }
+  enemyBullets = enemyBullets.filter(b=> b.x>-20 && b.x<W+20);
+
+  collectCoins();
+  checkLevelComplete();
+}
+
+function collectCoins(){
   for(const c of coins){
     if(c.got) continue;
     const dx = (player.x+player.w/2) - c.x;
@@ -406,39 +640,45 @@ function update(){
       c.got = true;
       collectedCount++;
       document.getElementById('hudCoins').textContent = collectedCount;
-     const photo = GAME_PHOTOS[c.photoIdx] || {caption:"Encontrado!", src:null};
+      const photo = GAME_PHOTOS[c.photoIdx] || {caption:"Encontrado!", src:null};
       openModal(photo.src, photo.caption);
     }
   }
+}
 
+function checkLevelComplete(){
   if(collectedCount>=totalThisLevel){
     levelRunning=false;
     saveProgress();
-    if(levelIdx < LEVELS.length-1){
+    const levels = currentLevels();
+    if(levelIdx < levels.length-1){
       setTimeout(()=>{
         levelIdx++;
         setupLevel(levelIdx);
       }, 600);
     } else {
       setTimeout(()=>{
-        showOverlay("Vale todo explorado! ✨", "Vocês encontraram todas as memórias escondidas nas 3 fases.", "Jogar novamente");
+        const msg = currentMode==='parkour'
+          ? "Vale todo explorado! ✨"
+          : "Missão cumprida! ✨";
+        const sub = currentMode==='parkour'
+          ? "Vocês encontraram todas as memórias escondidas nas 3 fases."
+          : "Vocês resgataram todas as memórias escondidas nas 3 fases de combate.";
+        showOverlay(msg, sub, "Jogar novamente");
         levelIdx = 0;
       }, 600);
     }
   }
 }
 
-function draw(){
-  ctx.clearRect(0,0,W,H);
+function update(){
+  if(!levelRunning) return;
+  if(currentMode==='parkour') updateParkour();
+  else updateShooter();
+}
 
-  // sky/background
-  ctx.fillStyle='#d7f2c5';
-  ctx.beginPath();
-  ctx.ellipse(120,H-30,140,60,0,0,Math.PI*2);
-  ctx.ellipse(650,H-20,180,70,0,0,Math.PI*2);
-  ctx.fill();
-
-  // ground with gaps drawn as missing segments
+function drawParkour(){
+  // chão com buracos desenhados como segmentos faltando
   ctx.fillStyle='#6d2740';
   let gx=0;
   const segs=[];
@@ -447,13 +687,68 @@ function draw(){
   segs.push({x:gx,w:W-gx});
   segs.forEach(s=>{ if(s.w>0) ctx.fillRect(s.x,H-40,s.w,40); });
 
-  // platforms (excluding ground)
+  // plataformas (exceto o chão)
   ctx.fillStyle='#6d2740';
   for(const p of platforms){ if(p.y!==H-40) ctx.fillRect(p.x,p.y,p.w,p.h); }
   ctx.fillStyle='#e8607f';
   for(const p of platforms){ if(p.y!==H-40) ctx.fillRect(p.x,p.y,p.w,4); }
 
-  // coins (hearts)
+  // inimigos (espinhos)
+  ctx.fillStyle='#3a1f2b';
+  for(const en of enemies){
+    ctx.beginPath();
+    ctx.moveTo(en.x, en.y+en.h);
+    ctx.lineTo(en.x+en.w*0.2, en.y);
+    ctx.lineTo(en.x+en.w*0.4, en.y+en.h);
+    ctx.lineTo(en.x+en.w*0.6, en.y);
+    ctx.lineTo(en.x+en.w*0.8, en.y+en.h);
+    ctx.lineTo(en.x+en.w, en.y);
+    ctx.lineTo(en.x+en.w, en.y+en.h);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawShooter(){
+  // chão contínuo
+  ctx.fillStyle='#6d2740';
+  ctx.fillRect(0,H-40,W,40);
+
+  // inimigos (soldados estilizados)
+  for(const en of enemies){
+    ctx.fillStyle='#3a1f2b';
+    ctx.fillRect(en.x, en.y, en.w, en.h);
+    ctx.fillStyle='#e8607f';
+    ctx.fillRect(en.x, en.y, en.w, 4);
+    // "cano da arma" apontando pro jogador
+    const dir = (player.x+player.w/2) < (en.x+en.w/2) ? -1 : 1;
+    ctx.fillStyle='#3a1f2b';
+    ctx.fillRect(dir>0? en.x+en.w : en.x-10, en.y+en.h*0.4, 10, 3);
+  }
+
+  // balas do jogador
+  ctx.fillStyle='#c9a13b';
+  for(const b of playerBullets){ ctx.fillRect(b.x,b.y,b.w,b.h); }
+
+  // balas inimigas
+  ctx.fillStyle='#e8607f';
+  for(const b of enemyBullets){ ctx.fillRect(b.x,b.y,b.w,b.h); }
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  // céu/fundo
+  ctx.fillStyle='#d7f2c5';
+  ctx.beginPath();
+  ctx.ellipse(120,H-30,140,60,0,0,Math.PI*2);
+  ctx.ellipse(650,H-20,180,70,0,0,Math.PI*2);
+  ctx.fill();
+
+  if(currentMode==='parkour') drawParkour();
+  else drawShooter();
+
+  // moedas (corações) — comuns aos dois modos
   for(const c of coins){
     if(c.got) continue;
     ctx.save();
@@ -470,27 +765,16 @@ function draw(){
     ctx.restore();
   }
 
-  // enemies (thorn/spike look)
-  ctx.fillStyle='#3a1f2b';
-  for(const en of enemies){
-    ctx.beginPath();
-    ctx.moveTo(en.x, en.y+en.h);
-    ctx.lineTo(en.x+en.w*0.2, en.y);
-    ctx.lineTo(en.x+en.w*0.4, en.y+en.h);
-    ctx.lineTo(en.x+en.w*0.6, en.y);
-    ctx.lineTo(en.x+en.w*0.8, en.y+en.h);
-    ctx.lineTo(en.x+en.w, en.y);
-    ctx.lineTo(en.x+en.w, en.y+en.h);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  // player
+  // jogador
   ctx.fillStyle='#c9a13b';
   ctx.fillRect(player.x, player.y, player.w, player.h);
   ctx.fillStyle='#3a1f2b';
   const eyeX = player.facing>0 ? player.x+player.w-8 : player.x+4;
   ctx.fillRect(eyeX, player.y+8, 4,4);
+  if(currentMode==='shooter'){
+    const gx = player.facing>0 ? player.x+player.w : player.x-10;
+    ctx.fillRect(gx, player.y+player.h*0.45, 10, 3);
+  }
 }
 
 function loop(){
@@ -500,9 +784,9 @@ function loop(){
 }
 
 (async function init(){
-  const saved = await storageGet(STORAGE_KEY);
+  const saved = await storageGet(storageKey());
   if(saved && typeof saved.levelIdx === 'number' && !saved.cleared){
-    levelIdx = Math.min(saved.levelIdx, LEVELS.length-1);
+    levelIdx = Math.min(saved.levelIdx, currentLevels().length-1);
   }
   setupLevel(levelIdx);
   loop();
